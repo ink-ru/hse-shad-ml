@@ -1,12 +1,14 @@
-# coding=utf-8
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+# https://github.com/tyz910/hse-shad-ml/blob/master/05-statement-linear/main.py
+
 import pandas
 from sklearn.linear_model import Perceptron
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler
 
 import sys
-sys.path.append("..")
-from shad_util import print_answer
 
 # 1. Загрузите обучающую и тестовую выборки из файлов perceptron-train.csv и perceptron-test.csv.
 # Целевая переменная записана в первом столбце, признаки — во втором и третьем.
@@ -43,5 +45,9 @@ acc_after = accuracy_score(y_test, model.predict(X_test_scaled))
 
 # 6. Найдите разность между качеством на тестовой выборке после нормализации и качеством до нее.
 # Это число и будет ответом на задание.
+rrr = acc_after - acc_before
+print(rrr)
 
-print_answer(1, acc_after - acc_before)
+file_answer = open("perceptron_answer.txt", "w")
+file_answer.write(repr(round(rrr, 2)))
+file_answer.close()
