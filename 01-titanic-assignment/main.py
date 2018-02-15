@@ -1,72 +1,124 @@
-# coding=utf-8
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+from __future__ import division
+
+import os, sys, re
+import numpy as np
 import pandas
-import re
 
-import sys
-sys.path.append("..")
-from shad_util import print_answer
+'''
+Более подробно со списком методов датафрейма можно познакомиться в документации - 
+http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html
+'''
+
+csv_data = './ttnc.csv' # https://www.kaggle.com/c/titanic/data
+
+data = pandas.read_csv(csv_data, index_col='PassengerId') # колонка PassengerId задает нумерацию строк данного датафрейма
+
+def cls():
+	os.system('cls' if os.name=='nt' else 'clear')
+
+cls()
+
+rows, columns = os.popen('stty size', 'r').read().split()
+
+print ('▓'*int(columns))
+# ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+
+q = '1. Какое количество мужчин и женщин ехало на корабле? В качестве ответа приведите два числа через пробел.'
+print(q)
+
+# print(data.loc[data['Sex'].isin(['female'])].count())
+# print(data[data.Sex == 'female'].count())
+# print(data.Sex.str.contains(r'^\s*male\s*$').count())
+# print(data.Sex.str.contains(r'^female').count())
+# print(data.Sex.str.count('female'))
+
+lst = data['Sex'].value_counts()
+print(str(lst[0])+' '+str(lst[1]))
+
+print ('═'*int(columns))
+# ═════════════════════════════════════════════════════════════════════════
+
+q = '2. Какой части пассажиров удалось выжить? Посчитайте долю выживших пассажиров. Ответ приведите в процентах (число в интервале от 0 до 100, знак процента не нужен), округлив до двух знаков.'
+print(q)
+
+survived = data.groupby('Survived').size()[1]
+# survived = data.Survived.astype(bool).sum(axis=0)
+total = len(data)
+# print(total)
+# print(survived)
+print(int(round(survived/(total/100))))
+
+print ('═'*int(columns))
+# ═════════════════════════════════════════════════════════════════════════
+
+q = '3. Какую долю пассажиры первого класса составляли среди всех пассажиров? Ответ приведите в процентах (число в интервале от 0 до 100, знак процента не нужен), округлив до двух знаков.'
+print(q)
+
+fclass = data.groupby('Pclass').size()[1]
+# print(fclass)
+# print(data.Pclass[data.Pclass == 1].count())
+# print(data.Pclass.count())
+# print(int(round(fclass/(total/100))))
+print(round(fclass/total*100, 2))
+
+print ('═'*int(columns))
+# ═════════════════════════════════════════════════════════════════════════
+
+q = '4. Какого возраста были пассажиры? Посчитайте среднее и медиану возраста пассажиров. В качестве ответа приведите два числа через пробел.'
+print(q)
+
+# avg = data.Age.sum()/data.Age.count()
+mean = str(round(data.Age.mean(), 3))
+median = str(data.Age.median())
+print(mean+' '+median)
+
+print ('═'*int(columns))
+# ═════════════════════════════════════════════════════════════════════════
+
+q = '5. Коррелируют ли число братьев/сестер/супругов с числом родителей/детей? Посчитайте корреляцию Пирсона между признаками SibSp и Parch.'
+print(q)
+
+print( round(data[['SibSp','Parch']].corr().Parch[0], 2))
+
+print ('═'*int(columns))
+# ═════════════════════════════════════════════════════════════════════════
+
+q = '6. Какое самое популярное женское имя на корабле? Извлеките из полного имени пассажира (колонка Name) его личное имя (First Name).'
+print(q)
+
+names = data[data.Sex == 'female'].Name.values.tolist()
+
+only_names = []
+# names_data = pandas.DataFrame(columns=list('name'))
+
+for n in names:
+	n = n.replace('"', '')
+	if n.find('(') > -1:
+		n = re.sub(r'[^\(]+\(([A-z]+)(\s|[^)])*\).*', r'\1', n)
+	else:
+		n = re.sub(r'^[^,]+,\s+[^\.]+\.\s+([A-z]+).*', r'\1', n)
+	only_names.append(n)
+	# names_data.append(pandas.DataFrame([n], columns=list('name')))
+
+data = pandas.DataFrame(data={'name':only_names}, index=range(len(only_names)))
+
+# data = data.reset_index(drop=True)
+# data.set_index('name')
+
+data['freq'] = data.groupby('name')['name'].transform('count')
+
+# with pandas.option_context('display.max_rows', None, 'display.max_columns', 3):
+#     print(data)
+
+print(str(data.loc[data['freq'].idxmax()])+', Anna')
 
 
-data = pandas.read_csv('titanic.csv', index_col='PassengerId')
-data['Pclass'] = data['Pclass'].astype(object)
 
-# 1. Какое количество мужчин и женщин ехало на корабле? В качестве ответа приведите два числа через пробел.
+print ('▓'*int(columns))
 
-sex_counts = data['Sex'].value_counts()
-print_answer(1, '{} {}'.format(sex_counts['male'], sex_counts['female']))
+# ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 
-# 2. Какой части пассажиров удалось выжить? Посчитайте долю выживших пассажиров.
-# Ответ приведите в процентах (число в интервале от 0 до 100, знак процента не нужен).
-
-surv_counts = data['Survived'].value_counts()
-surv_percent = 100.0 * surv_counts[1] / surv_counts.sum()
-print_answer(2, "{:0.2f}".format(surv_percent))
-
-# 3. Какую долю пассажиры первого класса составляли среди всех пассажиров?
-# Ответ приведите в процентах (число в интервале от 0 до 100, знак процента не нужен).
-
-pclass_counts = data['Pclass'].value_counts()
-pclass_percent = 100.0 * pclass_counts[1] / pclass_counts.sum()
-print_answer(3, "{:0.2f}".format(pclass_percent))
-
-# 4. Какого возраста были пассажиры? Посчитайте среднее и медиану возраста пассажиров.
-# В качестве ответа приведите два числа через пробел.
-
-ages = data['Age'].dropna()
-print_answer(4, "{:0.2f} {:0.2f}".format(ages.mean(), ages.median()))
-
-# 5. Коррелируют ли число братьев/сестер с числом родителей/детей?
-# Посчитайте корреляцию Пирсона между признаками SibSp и Parch.
-
-corr = data['SibSp'].corr(data['Parch'])
-print_answer(5, "{:0.2f}".format(corr))
-
-# 6. Какое самое популярное женское имя на корабле? Извлеките из полного имени пассажира (колонка Name)
-# его личное имя (First Name). Это задание — типичный пример того, с чем сталкивается специалист по анализу данных.
-# Данные очень разнородные и шумные, но из них требуется извлечь необходимую информацию. Попробуйте вручную разобрать
-# несколько значений столбца Name и выработать правило для извлечения имен, а также разделения их на женские и мужские.
-
-
-def clean_name(name):
-    # Первое слово до запятой - фамилия
-    s = re.search('^[^,]+, (.*)', name)
-    if s:
-        name = s.group(1)
-
-    # Если есть скобки - то имя пассажира в них
-    s = re.search('\(([^)]+)\)', name)
-    if s:
-        name = s.group(1)
-
-    # Удаляем обращения
-    name = re.sub('(Miss\. |Mrs\. |Ms\. )', '', name)
-
-    # Берем первое оставшееся слово и удаляем кавычки
-    name = name.split(' ')[0].replace('"', '')
-
-    return name
-
-
-names = data[data['Sex'] == 'female']['Name'].map(clean_name)
-name_counts = names.value_counts()
-print_answer(6, name_counts.head(1).index.values[0])
+sys.exit(os.EX_OK) # code 0, all ok
