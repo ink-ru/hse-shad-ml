@@ -51,8 +51,10 @@ model.fit(vectorizer.transform(X), y)
 
 words = vectorizer.get_feature_names()
 coef = pandas.DataFrame(model.coef_.data, model.coef_.indices)
+
 top_words = coef[0].map(lambda w: abs(w)).sort_values(ascending=False).head(10).index.map(lambda i: words[i])
-top_words.sort_values()
+
+top_words = np.sort(top_words.unique().values)
 ans = ','.join(top_words)
 print(ans)
 
