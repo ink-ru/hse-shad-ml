@@ -1,14 +1,12 @@
-# coding=utf-8
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
 import pandas
 import numpy as np
 from sklearn import datasets, grid_search
 from sklearn.svm import SVC
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cross_validation import KFold
-
-import sys
-sys.path.append("..")
-from shad_util import print_answer
 
 # 1. Загрузите объекты из новостного датасета 20 newsgroups, относящиеся к категориям "космос" и
 # "атеизм" (инструкция приведена выше). Обратите внимание, что загрузка данных может занять несколько минут
@@ -54,5 +52,10 @@ model.fit(vectorizer.transform(X), y)
 words = vectorizer.get_feature_names()
 coef = pandas.DataFrame(model.coef_.data, model.coef_.indices)
 top_words = coef[0].map(lambda w: abs(w)).sort_values(ascending=False).head(10).index.map(lambda i: words[i])
-top_words.sort()
-print_answer(1, ','.join(top_words))
+top_words.sort_values()
+ans = ','.join(top_words)
+print(ans)
+
+file_answer = open("svm_answer.txt", "w")
+file_answer.write(ans)
+file_answer.close()
