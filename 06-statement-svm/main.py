@@ -1,10 +1,8 @@
-# coding=utf-8
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
 import pandas
 from sklearn.svm import SVC
-
-import sys
-sys.path.append("..")
-from shad_util import print_answer
 
 # 1. Загрузите выборку из файла svm-data.csv. В нем записана двумерная выборка (целевая переменная указана
 # в первом столбце, признаки — во втором и третьем).
@@ -28,4 +26,9 @@ model.fit(X, y)
 
 n_sv = model.support_
 n_sv.sort()
-print_answer(1, ' '.join([str(n + 1) for n in n_sv]))
+ans = ' '.join([str(n + 1) for n in n_sv])
+print(ans)
+
+file_answer = open("support_answer.txt", "w")
+file_answer.write(ans)
+file_answer.close()
