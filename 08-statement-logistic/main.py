@@ -1,16 +1,14 @@
-# coding=utf-8
-import pandas
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+import pandas, sys, os
 import math
 from sklearn.metrics import roc_auc_score
-
-import sys
-sys.path.append("..")
-from shad_util import print_answer
 
 # 1. Загрузите данные из файла data-logistic.csv. Это двумерная выборка, целевая переменная на которой
 # принимает значения -1 или 1.
 
-df = pandas.read_csv('data-logistic.csv', header=None)
+df = pandas.read_csv('logistic.csv', header=None)
 y = df[0]
 X = df.loc[:, 1:]
 
@@ -21,7 +19,7 @@ X = df.loc[:, 1:]
 def fw1(w1, w2, y, X, k, C):
     l = len(y)
     S = 0
-    for i in xrange(0, l):
+    for i in range(0, l):
         S += y[i] * X[1][i] * (1.0 - 1.0 / (1.0 + math.exp(-y[i] * (w1*X[1][i] + w2*X[2][i]))))
 
     return w1 + (k * (1.0 / l) * S) - k * C * w1
@@ -30,7 +28,7 @@ def fw1(w1, w2, y, X, k, C):
 def fw2(w1, w2, y, X, k, C):
     l = len(y)
     S = 0
-    for i in xrange(0, l):
+    for i in range(0, l):
         S += y[i] * X[2][i] * (1.0 - 1.0 / (1.0 + math.exp(-y[i] * (w1*X[1][i] + w2*X[2][i]))))
 
     return w2 + (k * (1.0 / l) * S) - k * C * w2
@@ -78,5 +76,10 @@ y_rscore = X.apply(lambda x: a(x, rw1, rw2), axis=1)
 auc = roc_auc_score(y, y_score)
 rauc = roc_auc_score(y, y_rscore)
 
-print_answer(1, "{:0.3f} {:0.3f}".format(auc, rauc))
+print("{:0.3f} {:0.3f}".format(auc, rauc))
 
+file_answer = open("logistic_answer.txt", "w")
+file_answer.write("{:0.3f} {:0.3f}".format(auc, rauc))
+file_answer.close()
+
+sys.exit(os.EX_OK) # code 0, all ok
