@@ -1,12 +1,11 @@
-# coding=utf-8
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
 import pandas
 from sklearn.decomposition import PCA
 from numpy import corrcoef
 
-import sys
-sys.path.append("..")
-from shad_util import print_answer
-
+import sys, os
 
 # 1. Загрузите данные close_prices.csv. В этом файле приведены цены акций 30 компаний на закрытии торгов за каждый
 # день периода.
@@ -28,7 +27,7 @@ for v in pca.explained_variance_ratio_:
     if var >= 0.9:
         break
 
-print_answer(1, n_var)
+ans1 = n_var
 
 # 3. Примените построенное преобразование к исходным данным и возьмите значения первой компоненты.
 
@@ -41,11 +40,27 @@ comp0 = df_comp[0]
 df2 = pandas.read_csv('djia_index.csv')
 dji = df2['^DJI']
 corr = corrcoef(comp0, dji)
-print_answer(2, corr[1, 0])
+
+ans2 = corr[1, 0]
 
 # 5. Какая компания имеет наибольший вес в первой компоненте? Укажите ее название с большой буквы.
 
 comp0_w = pandas.Series(pca.components_[0])
 comp0_w_top = comp0_w.sort_values(ascending=False).head(1).index[0]
 company = X.columns[comp0_w_top]
-print_answer(3, company)
+
+ans3 = company
+
+print(ans1, "\n", ans2, "\n", ans3, "\n",)
+
+file_answer1 = open("pricipal_answer1.txt", "w")
+file_answer2 = open("pricipal_answer2.txt", "w")
+file_answer3 = open("pricipal_answer3.txt", "w")
+file_answer1.write(str(ans1))
+file_answer2.write(str(ans2))
+file_answer3.write(str(ans3))
+file_answer1.close()
+file_answer2.close()
+file_answer3.close()
+
+sys.exit(os.EX_OK) # code 0, all ok
