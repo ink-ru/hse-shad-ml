@@ -1,13 +1,13 @@
-# coding=utf-8
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
 import pandas
 import numpy
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.cross_validation import KFold, cross_val_score
 
-import sys
-sys.path.append("..")
-from shad_util import print_answer
+import sys, os
 
 # 1. Загрузите данные из файла abalone.csv. Это датасет, в котором требуется предсказать возраст ракушки (число колец)
 # по физическим измерениям.
@@ -34,7 +34,7 @@ y = df['Rings']
 kf = KFold(y.size, n_folds=5, shuffle=True, random_state=1)
 
 scores = [0.0]
-n_estimators = xrange(1, 51)
+n_estimators = range(1, 51)
 for n in n_estimators:
     model = RandomForestRegressor(n_estimators=n, random_state=1)
     score = numpy.mean(cross_val_score(model, X, y, cv=kf, scoring='r2'))
@@ -45,7 +45,7 @@ for n in n_estimators:
 
 for n, score in enumerate(scores):
     if score > 0.52:
-        print_answer(1, n)
+        print(n)
         break
 
 # 6. Обратите внимание на изменение качества по мере роста числа деревьев. Ухудшается ли оно?
@@ -54,3 +54,9 @@ plt.plot(scores)
 plt.xlabel('n_estimators')
 plt.ylabel('score')
 plt.savefig('estimators_score.png')
+
+file_answer = open("forest_answer.txt", "w")
+file_answer.write(str(repr(round(n, 2))))
+file_answer.close()
+
+sys.exit(os.EX_OK) # code 0, all ok
