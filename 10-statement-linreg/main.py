@@ -1,13 +1,13 @@
-# coding=utf-8
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
 import pandas
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.linear_model import Ridge
 from scipy.sparse import hstack
 
-import sys
-sys.path.append("..")
-from shad_util import print_answer
+import sys, os
 
 # 1. Загрузите данные об описаниях вакансий и соответствующих годовых зарплатах из файла salary-train.csv.
 
@@ -63,4 +63,11 @@ X_test_cat = enc.transform(test[['LocationNormalized', 'ContractTime']].to_dict(
 X_test = hstack([X_test_text, X_test_cat])
 
 y_test = model.predict(X_test)
-print_answer(1, '{:0.2f} {:0.2f}'.format(y_test[0], y_test[1]))
+ans = '{:0.2f} {:0.2f}'.format(y_test[0], y_test[1])
+print(ans)
+
+file_answer = open("linreg_answer.txt", "w")
+file_answer.write(ans)
+file_answer.close()
+
+sys.exit(os.EX_OK) # code 0, all ok
