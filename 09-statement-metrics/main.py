@@ -1,10 +1,9 @@
-# coding=utf-8
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+import sys, os
 import pandas
 import sklearn.metrics as metrics
-
-import sys
-sys.path.append("..")
-from shad_util import print_answer
 
 # 1. Загрузите файл classification.csv. В нем записаны истинные классы объектов выборки (колонка true) и ответы
 # некоторого классификатора (колонка predicted).
@@ -16,10 +15,10 @@ df = pandas.read_csv('classification.csv')
 # Ответ в данном вопросе — четыре числа через пробел.
 
 clf_table = {'tp': (1, 1), 'fp': (0, 1), 'fn': (1, 0), 'tn': (0, 0)}
-for name, res in clf_table.iteritems():
+for name, res in clf_table.items():
     clf_table[name] = len(df[(df['true'] == res[0]) & (df['pred'] == res[1])])
 
-print_answer(1, '{tp} {fp} {fn} {tn}'.format(**clf_table))
+ans1 = '{tp} {fp} {fn} {tn}'.format(**clf_table)
 
 # 3. Посчитайте основные метрики качества классификатора:
 
@@ -36,7 +35,7 @@ rec = metrics.recall_score(df['true'], df['pred'])
 f1 = metrics.f1_score(df['true'], df['pred'])
 
 # В качестве ответа укажите эти четыре числа через пробел.
-print_answer(2, '{:0.2f} {:0.2f} {:0.2f} {:0.2f}'.format(acc, pr, rec, f1))
+ans2 = '{:0.2f} {:0.2f} {:0.2f} {:0.2f}'.format(acc, pr, rec, f1)
 
 # 4. Имеется четыре обученных классификатора. В файле scores.csv записаны истинные классы и значения степени
 # принадлежности положительному классу для каждого классификатора на некоторой выборке:
@@ -56,7 +55,7 @@ scores = {}
 for clf in df2.columns[1:]:
     scores[clf] = metrics.roc_auc_score(df2['true'], df2[clf])
 
-print_answer(3, pandas.Series(scores).sort_values(ascending=False).head(1).index[0])
+ans3 = repr(pandas.Series(scores).sort_values(ascending=False).head(1).index[0])
 
 # 6. Какой классификатор достигает наибольшей точности (Precision) при полноте (Recall) не менее 70% ?
 # Какое значение точности при этом получается? Чтобы получить ответ на этот вопрос, найдите все точки
@@ -70,4 +69,21 @@ for clf in df2.columns[1:]:
     pr_curve_df = pandas.DataFrame({'precision': pr_curve[0], 'recall': pr_curve[1]})
     pr_scores[clf] = pr_curve_df[pr_curve_df['recall'] >= 0.7]['precision'].max()
 
-print_answer(4, pandas.Series(pr_scores).sort_values(ascending=False).head(1).index[0])
+ans4 = repr(pandas.Series(pr_scores).sort_values(ascending=False).head(1).index[0])
+
+print(ans1,"\n",ans2,"\n",ans3,"\n",ans4,"\n")
+
+file_answer1 = open("accuracy_answer1.txt", "w")
+file_answer2 = open("accuracy_answer2.txt", "w")
+file_answer3 = open("accuracy_answer3.txt", "w")
+file_answer4 = open("accuracy_answer4.txt", "w")
+file_answer1.write(ans1)
+file_answer2.write(ans2)
+file_answer3.write(ans3)
+file_answer4.write(ans4)
+file_answer1.close()
+file_answer2.close()
+file_answer3.close()
+file_answer4.close()
+
+sys.exit(os.EX_OK) # code 0, all ok
