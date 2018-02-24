@@ -1,46 +1,63 @@
-# coding=utf-8
-import numpy as np
-import pandas
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+from __future__ import division
 from sklearn.tree import DecisionTreeClassifier
 
-import sys
-sys.path.append("..")
-from shad_util import print_answer
+import os, sys, re
+import numpy as np
+import pandas
 
+'''
+Подробнее про решающие деревья в sklearn - http://scikit-learn.org/stable/modules/tree.html
+'''
 
-# 1. Загрузите выборку из файла titanic.csv с помощью пакета Pandas.
+def cls():
+	os.system('cls' if os.name=='nt' else 'clear')
 
-df = pandas.read_csv('titanic.csv', index_col='PassengerId')
+cls()
 
-# 2. Оставьте в выборке четыре признака: класс пассажира (Pclass), цену билета (Fare),
-# возраст пассажира (Age) и его пол (Sex).
+rows, columns = os.popen('stty size', 'r').read().split()
 
-x_labels = ['Pclass', 'Fare', 'Age', 'Sex']
-X = df.loc[:, x_labels]
+# Загрузите выборку из файла titanic.csv с помощью пакета Pandas.
+csv_data = './ttnc.csv' # https://www.kaggle.com/c/titanic/data
 
-# 3. Обратите внимание, что признак Sex имеет строковые значения.
+data = pandas.read_csv(csv_data, index_col='PassengerId') # колонка PassengerId задает нумерацию строк данного датафрейма
 
-X['Sex'] = X['Sex'].map(lambda sex: 1 if sex == 'male' else 0)
+# Преобразуем строковый признак Sex в бинарный
 
-# 4. Выделите целевую переменную — она записана в столбце Survived.
+# data.Sex.apply(lambda x:  0 if x.find('male') > -1 else 1)
+data['Sex'] = np.where(data['Sex'] == 'male' , 1, 0)
 
-y = df['Survived']
+# Найдите все объекты, у которых есть пропущенные признаки, и удалите их из выборки.
 
-# 5. В данных есть пропущенные значения — например, для некоторых пассажиров неизвестен их возраст.
-# Такие записи при чтении их в pandas принимают значение nan. Найдите все объекты, у которых есть пропущенные признаки,
-# и удалите их из выборки.
+data = data[np.isfinite(data['Age'])] # data1 = np.isnan(data)
 
-X = X.dropna()
-y = y[X.index.values]
+# Выделите целевую переменную — она записана в столбце Survived
+t_data = data['Survived'] # target data
 
-# 6. Обучите решающее дерево с параметром random_state=241 и остальными параметрами по умолчанию.
+# Оставьте в выборке четыре признака: класс пассажира (Pclass), цену билета (Fare), возраст пассажира (Age) и его пол (Sex).
+
+col_list = ['Pclass', 'Fare', 'Age', 'Sex']
+data = data[col_list] # df.filter(items=['Pclass', 'Fare', 'Age', 'Sex'])
+
+# Обучите решающее дерево с параметром random_state=241
 
 clf = DecisionTreeClassifier(random_state=241)
-clf.fit(np.array(X.values), np.array(y.values))
+clf.fit(data, t_data)
+importances = clf.feature_importances_
 
-# 7. Вычислите важности признаков и найдите два признака с наибольшей важностью.
-# Их названия будут ответами для данной задачи (в качестве ответа укажите названия признаков через запятую или пробел,
-# порядок не важен).
+print ('▓'*int(columns))
+# ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 
-importances = pandas.Series(clf.feature_importances_, index=x_labels)
-print_answer(1, ' '.join(importances.sort_values(ascending=False).head(2).index.values))
+print(importances)
+
+# print ('═'*int(columns))
+# ═════════════════════════════════════════════════════════════════════════
+
+
+print ('▓'*int(columns))
+
+# ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+
+sys.exit(os.EX_OK) # code 0, all ok
