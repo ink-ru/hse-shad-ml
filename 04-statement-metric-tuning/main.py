@@ -1,4 +1,9 @@
-# coding=utf-8
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+# https://github.com/hannarud/machine-learning-hse/blob/master/Ass4_ChooseMetrics/Ass4_ChooseMetrics.py
+# https://github.com/tyz910/hse-shad-ml/blob/master/04-statement-metric-tuning/main.py
+
 import pandas
 import sklearn
 from numpy import linspace
@@ -7,8 +12,6 @@ from sklearn.cross_validation import KFold, cross_val_score
 from sklearn.neighbors import KNeighborsRegressor
 
 import sys
-sys.path.append("..")
-from shad_util import print_answer
 
 # 1. Загрузите выборку Boston с помощью функции sklearn.datasets.load_boston(). Результатом вызова данной функции
 # является объект, у которого признаки записаны в поле data, а целевой вектор — в поле target.
@@ -47,4 +50,8 @@ accuracy = test_accuracy(kf, X, y)
 # Это значение параметра и будет ответом на задачу.
 
 top_accuracy = accuracy.head(1)
-print_answer(1, top_accuracy.index[0])
+print(top_accuracy.index[0])
+
+file_answer = open("answer.txt", "w")
+file_answer.write(repr(round(top_accuracy.index[0], 1)))
+file_answer.close()
